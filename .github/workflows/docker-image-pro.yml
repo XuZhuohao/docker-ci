@@ -20,7 +20,7 @@ env:
   tag: ${{ inputs.tag }}
 
 jobs:
-  pre:
+  ci:
     runs-on: ubuntu-latest
     steps:
     - name: split image name

@@ -22,8 +22,11 @@ jobs:
       run: |
         git clone ${{ inputs.address }}
         cd ${{ env.project_name }}
+        pwd
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
+      run: |
+        pwd
+        docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
     - name: login docker hub
       run: docker login -u=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
     - name: push docker hub

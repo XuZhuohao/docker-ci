@@ -1,0 +1,32 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      address: 
+        description: 'git http url' 
+        required: true
+        type: string
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    # from ${{ inputs.address }} to get project name 
+    - name: split image name
+      run: |
+        echo echo ${{ inputs.address }}|awk -F "/" '{print $NF}' | awk -F "." '{print "project_name=" $1}' >> "$GITHUB_ENV"
+    # clone project and cd 
+    - name: clone project
+      run: |
+        git clone ${{ inputs.address }}
+        cd ${{ env.project_name }}
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${{env.IMAGE_NAME}}
+    - name: login docker hub
+      run: docker login -u=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
+    - name: push docker hub
+      run: docker push ${{env.IMAGE_NAME}}
+        
+

@@ -24,8 +24,8 @@ jobs:
         pwd
     - name: Build the Docker image
       run: |
-        ls
-        docker build . --file ${{ env.project_name }}/Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
+        cd ${{ env.project_name }}
+        docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
     - name: login docker hub
       run: docker login -u=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
     - name: push docker hub

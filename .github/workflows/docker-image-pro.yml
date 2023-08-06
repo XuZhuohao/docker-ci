@@ -23,8 +23,6 @@ jobs:
   pro:
     runs-on: ubuntu-latest
     steps:
-    - name: clone project
-      run: git clone ${{ inputs.address }}
     - name: split image name
       run: |
         echo echo ${{ inputs.address }}|awk -F "/" '{print $NF}' | awk -F "." '{print "project_name=" $1}' >> "$GITHUB_ENV"
@@ -32,8 +30,11 @@ jobs:
     if: inputs.tag == 'none'
     runs-on: ubuntu-latest
     steps:
+    - name: clone project
+      run: git clone ${{ inputs.address }}
     - name: get tag
       run: |
+        echo ${{ env.project_name }}
         cd ${{ env.project_name }}
         echo git describe --abbrev=0 --tags | echo "tag=" | >> "$GITHUB_ENV"
   build:
@@ -41,6 +42,7 @@ jobs:
     steps:
     - name: checkout tag version
       run: |
+        echo ${{ env.tag}}
         cd ${{ env.project_name }}
         git checkout -b ${{ env.tag}}
     - name: Build the Docker image

@@ -1,0 +1,55 @@
+name: Docker Image CI Pro
+on:
+  workflow_dispatch:
+    inputs:
+      address: 
+        description: 'git repositories adress(http)' 
+        required: true
+        type: string
+      tag:
+        description: 'code version'
+        required: false
+        type: string
+        default: 'none'
+      # branch:
+        # description: 'code branch'
+        # required: false
+        # type: string
+        # default: 'none'
+env:
+  tag: ${{ inputs.tag }}
+
+jobs:
+  pro:
+    runs-on: ubuntu-latest
+    steps:
+    - name: clone project
+      run: git clone ${{ inputs.address }}
+    - name: split image name
+      run: |
+        echo echo ${{ inputs.address }}|awk -F "/" '{print $NF}' | awk -F "." '{print "project_name=" $1}' >> "$GITHUB_ENV"
+  set-tag:
+    if: inputs.tag == 'none'
+    runs-on: ubuntu-latest
+    steps:
+    - name: get tag
+      run: |
+        cd ${{ env.project_name }}
+        echo git describe --abbrev=0 --tags | echo "tag=" | >> "$GITHUB_ENV"
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout tag version
+      run: |
+        cd ${{ env.project_name }}
+        git checkout -b ${{ env.tag}}
+    - name: Build the Docker image
+      run: |
+        cd ${{ env.project_name }}
+        docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
+    - name: login docker hub
+      run: docker login -u=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
+    - name: push docker hub
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
+    
+    

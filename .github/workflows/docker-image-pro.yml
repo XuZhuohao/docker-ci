@@ -26,6 +26,7 @@ jobs:
     - name: split image name
       run: |
         echo echo ${{ inputs.address }}|awk -F "/" '{print $NF}' | awk -F "." '{print "project_name=" $1}' >> "$GITHUB_ENV"
+        echo ${{ env.project_name }}
   set-tag:
     needs: pre
     if: inputs.tag == 'none'

@@ -52,6 +52,6 @@ jobs:
     - name: override latest
       run: |
        docker tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:${{ env.tag }} ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
-       run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
+       docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
     
     

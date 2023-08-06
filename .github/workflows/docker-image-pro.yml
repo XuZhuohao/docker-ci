@@ -44,10 +44,14 @@ jobs:
     - name: Build the Docker image
       run: |
         cd ${{ env.project_name }}
-        docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
+        docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:${{ env.tag }}
     - name: login docker hub
       run: docker login -u=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
     - name: push docker hub
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:${{ env.tag }}
+    - name: override latest
+      run: |
+       docker tag ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:${{ env.tag }} ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
+       run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:latest
     
     

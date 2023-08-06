@@ -35,7 +35,7 @@ jobs:
       run: |
         echo ${{ env.project_name }}
         cd ${{ env.project_name }}
-        echo git describe --abbrev=0 --tags | echo "tag=" | >> "$GITHUB_ENV"
+        echo git describe --abbrev=0 --tags | echo "tag="  >> "$GITHUB_ENV"
     - name: checkout tag version
       run: |
         echo ${{ env.tag}}

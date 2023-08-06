@@ -54,6 +54,7 @@ jobs:
       run: docker login -u=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
     # push docker image ,with version is tag
     - name: push docker hub
+      if: inputs.tag != 'none'
       run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.project_name }}:${{ env.tag }}
     # push docker image ,with version is latest  
     - name: override latest

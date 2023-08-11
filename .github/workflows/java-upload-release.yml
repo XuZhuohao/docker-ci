@@ -51,7 +51,9 @@ jobs:
         java-version: ${{ inputs.jdk_version }}
         cache: 'maven'
     - name:  mvn clean & install 
-      run: mvn clean install
+      run: |
+        cd ${{ env.project_name }}
+        mvn clean install
       
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2

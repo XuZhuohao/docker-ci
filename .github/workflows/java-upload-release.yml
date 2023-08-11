@@ -1,0 +1,70 @@
+name: java-upload-release
+on:
+  workflow_dispatch:
+    inputs:
+      address: 
+        description: 'git repositories adress(http)' 
+        required: true
+        type: string
+      tag:
+        description: 'code version'
+        required: false
+        type: string
+        default: 'none'
+      jdk_version:
+        description: 'jdk version defalulst 17'
+        required: false
+        type: string
+        default: '17'
+env:
+  tag: ${{ inputs.tag }}      
+  
+jobs:
+  mvn-install:
+    runs-on: ubuntu-latest
+    steps:
+    # get project name from address 
+    - name: split image name
+      run: |
+        echo echo ${{ inputs.address }}|awk -F "/" '{print $NF}' | awk -F ".git" '{print "project_name=" $1}' >> "$GITHUB_ENV"
+    # clone project
+    - name: clone project
+      run: git clone ${{ inputs.address }}
+    # if tag is none, get the up-to-date tag 
+    - name: get tag
+      if: inputs.tag == 'none'
+      run: |
+        echo ${{ env.project_name }}
+        cd ${{ env.project_name }}
+        git describe --abbrev=0 --tags | awk '{print "tag=" $1}' >> "$GITHUB_ENV"
+    # checkout version if tag != none
+    - name: checkout tag version
+      if: inputs.tag != 'none'
+      run: |
+        echo ${{ env.tag}}
+        cd ${{ env.project_name }}
+        git checkout -b ${{ env.tag}}
+    # mvn clean & install 
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: ${{ input.jdk_version }}
+        cache: 'maven'
+    - name:  mvn clean & install 
+      run: mvn clean install
+      
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        # repo_name: owner/repository-name
+        # A personal access token for the GitHub repository in which the release will be created and edited.
+        # It is recommended to create the access token with the following scopes: `repo, user, admin:repo_hook`.
+        repo_token: ${{ secrets.YOUR_PERSONAL_ACCESS_TOKEN }}
+        file: target/*.jar
+        asset_name: ${{ env.project_name }}
+        tag: ${{ env.tag }}
+        overwrite: true
+        body: "auto upload from docker-ci/java-upload-release"
+      
+  
+    

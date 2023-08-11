@@ -48,7 +48,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: ${{ input.jdk_version }}
+        java-version: ${{ inputs.jdk_version }}
         cache: 'maven'
     - name:  mvn clean & install 
       run: mvn clean install
